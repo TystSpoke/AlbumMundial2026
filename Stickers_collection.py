@@ -15,31 +15,39 @@ FILE_PATH = "datos.csv"
 # --- FUNCIONES DE BASE DE DATOS (GITHUB CSV) ---
 
 def cargar_datos():
-    """Lee el CSV desde GitHub con las columnas ID, Tipo y Cantidad"""
     try:
         g = Github(GITHUB_TOKEN)
         repo = g.get_repo(REPO_NAME)
         file_content = repo.get_contents(FILE_PATH)
-        decoded_content = file_content.decoded_content.decode()
+        # Forzamos la decodificación a utf-8-sig para ignorar caracteres raros al inicio
+        decoded_content = file_content.decoded_content.decode('utf-8-sig')
         df = pd.read_csv(io.StringIO(decoded_content))
 
-        df.columns = df.columns.str.strip()
-
+        # LIMPIEZA TOTAL: Quitamos espacios y carácteres raros de los nombres de columnas
+        df.columns = [str(c).strip() for c in df.columns]
 
         st.session_state.file_sha = file_content.sha
 
         if not df.empty:
-            # Filtra los que son parte de tu colección personal
-            coleccion = df[df["Tipo"] == "Colección"]["ID"].tolist()
-            st.session_state.album = set(str(x) for x in coleccion)
+            # Buscamos "Colecci" (así no importa si es con o sin acento)
+            mask_album = df.iloc[:, 1].str.contains("Colecci", case=False, na=False)
+            st.session_state.album = set(df[mask_album].iloc[:, 0].astype(str).str.strip())
 
-            # Filtra las repetidas y guarda su cantidad
-            reps = df[df["Tipo"] == "Repetida"]
-            st.session_state.repetidas = dict(zip(reps["ID"].astype(str), reps["Cantidad"].astype(int)))
+            # Buscamos "Repetida"
+            mask_rep = df.iloc[:, 1].str.contains("Repetida", case=False, na=False)
+            df_reps = df[mask_rep]
+            st.session_state.repetidas = dict(zip(
+                df_reps.iloc[:, 0].astype(str).str.strip(),
+                df_reps.iloc[:, 2].astype(int)
+            ))
         else:
             st.session_state.album = set()
             st.session_state.repetidas = {}
+
     except Exception as e:
+        # Esto evita el error de "AttributeError" inicializando las variables aunque falle la red
+        st.session_state.album = set()
+        st.session_state.repetidas = {}
         st.error(f"Error de sincronización: {e}")
 
 def guardar_cambios():
