@@ -29,20 +29,22 @@ def cargar_datos():
         st.session_state.file_sha = file_content.sha
 
         if not df.empty:
-            # Buscamos "Colecci" (así no importa si es con o sin acento)
+            # Filtro para Álbum
             mask_album = df.iloc[:, 1].str.contains("Colecci", case=False, na=False)
             st.session_state.album = set(df[mask_album].iloc[:, 0].astype(str).str.strip())
 
-            # Buscamos "Repetida"
+            # Filtro para Repetidas (con manejo de errores de columna)
             mask_rep = df.iloc[:, 1].str.contains("Repetida", case=False, na=False)
             df_reps = df[mask_rep]
-            st.session_state.repetidas = dict(zip(
-                df_reps.iloc[:, 0].astype(str).str.strip(),
-                df_reps.iloc[:, 2].astype(int)
-            ))
-        else:
-            st.session_state.album = set()
-            st.session_state.repetidas = {}
+
+            # Si el archivo tiene las 3 columnas, las lee; si no, pone 1 por defecto
+            if df.shape[1] >= 3:
+                st.session_state.repetidas = dict(zip(
+                    df_reps.iloc[:, 0].astype(str).str.strip(),
+                    pd.to_numeric(df_reps.iloc[:, 2], errors='coerce').fillna(1).astype(int)
+                ))
+            else:
+                st.session_state.repetidas = {str(x).strip(): 1 for x in df_reps.iloc[:, 0]}
 
     except Exception as e:
         # Esto evita el error de "AttributeError" inicializando las variables aunque falle la red
