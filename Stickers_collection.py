@@ -6,6 +6,7 @@ from streamlit_gsheets import GSheetsConnection
 st.set_page_config(page_title="Álbum 2026 Pro", layout="centered")
 
 # 2. Conexión a Google Sheets
+# Así debe quedar tu conexión en el código
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 # --- FUNCIONES DE BASE DE DATOS ---
