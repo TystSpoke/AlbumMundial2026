@@ -8,14 +8,14 @@ st.set_page_config(page_title="Álbum 2026 Pro", layout="centered")
 
 # 2. Configuración de GitHub (Desde Secrets)
 GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
-REPO_NAME = "TuUsuario/AlbumMundial2026"  # <--- CAMBIA ESTO por tu Usuario/NombreDelRepo
+REPO_NAME = "TystSpoke/AlbumMundial2026"  # <--- CAMBIA ESTO por tu Usuario/NombreDelRepo
 FILE_PATH = "datos.csv"
 
 
 # --- FUNCIONES DE BASE DE DATOS (GITHUB CSV) ---
 
 def cargar_datos():
-    """Lee el CSV directamente desde tu repositorio de GitHub"""
+    """Lee el CSV desde GitHub con las columnas ID, Tipo y Cantidad"""
     try:
         g = Github(GITHUB_TOKEN)
         repo = g.get_repo(REPO_NAME)
@@ -23,26 +23,21 @@ def cargar_datos():
         decoded_content = file_content.decoded_content.decode()
         df = pd.read_csv(io.StringIO(decoded_content))
 
-        # Guardamos el SHA para poder actualizar el archivo luego
         st.session_state.file_sha = file_content.sha
 
         if not df.empty:
-            # Cargar estampas pegadas
+            # Filtra los que son parte de tu colección personal
             coleccion = df[df["Tipo"] == "Colección"]["ID"].tolist()
             st.session_state.album = set(str(x) for x in coleccion)
 
-            # Cargar repetidas
+            # Filtra las repetidas y guarda su cantidad
             reps = df[df["Tipo"] == "Repetida"]
             st.session_state.repetidas = dict(zip(reps["ID"].astype(str), reps["Cantidad"].astype(int)))
         else:
             st.session_state.album = set()
             st.session_state.repetidas = {}
-
     except Exception as e:
-        st.error(f"Error al conectar con GitHub: {e}")
-        st.session_state.album = set()
-        st.session_state.repetidas = {}
-
+        st.error(f"Error de sincronización: {e}")
 
 def guardar_cambios():
     """Actualiza el archivo CSV en GitHub haciendo un commit automático"""
