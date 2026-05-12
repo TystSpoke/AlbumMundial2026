@@ -23,6 +23,9 @@ def cargar_datos():
         decoded_content = file_content.decoded_content.decode()
         df = pd.read_csv(io.StringIO(decoded_content))
 
+        df.columns = df.columns.str.strip()
+
+
         st.session_state.file_sha = file_content.sha
 
         if not df.empty:
