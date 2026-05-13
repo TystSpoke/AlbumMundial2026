@@ -1,4 +1,5 @@
 ID,Tipo,Cantidad
+AUS 20,Colección,1
 SWE 8,Colección,1
 IRQ 1,Colección,1
 CZE 9,Colección,1
@@ -27,6 +28,7 @@ USA 6,Colección,1
 SWE 2,Colección,1
 COL 12,Colección,1
 PAR 20,Colección,1
+IRN 4,Colección,1
 TUR 10,Colección,1
 CPV 19,Colección,1
 IRQ 20,Colección,1
@@ -58,9 +60,9 @@ CAN 2,Colección,1
 COD 14,Colección,1
 SWE 20,Colección,1
 SWE 5,Colección,1
+CUW 18,Colección,1
 TUR 7,Colección,1
 CZE 1,Colección,1
 USA 13,Colección,1
 PAR 9,Colección,1
 CZE 15,Repetida,1
-CZE 1,Repetida,1
