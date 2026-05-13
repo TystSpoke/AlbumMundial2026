@@ -91,16 +91,27 @@ if 'album' not in st.session_state or 'repetidas' not in st.session_state:
 def procesar_intercambio(recibidas, dadas):
     # 1. Procesar recibidas
     for r in recibidas:
-        if r.strip():
-            st.session_state.album.add(r.strip().upper())
+        r = r.strip().upper()
+        if r:
+            # Si ya la tienes en el álbum, va a repetidas
+            if r in st.session_state.album:
+                st.session_state.repetidas[r] = st.session_state.repetidas.get(r, 0) + 1
+            else:
+                # Si no la tienes, se pega en el álbum
+                st.session_state.album.add(r)
 
-    # 2. Procesar dadas
+    # 2. Procesar dadas (lo que entregas sale de tus repetidas)
     for d in dadas:
         d = d.strip().upper()
-        if d in st.session_state.repetidas:
-            st.session_state.repetidas[d] -= 1
-            if st.session_state.repetidas[d] <= 0:
-                del st.session_state.repetidas[d]
+        if d:
+            if d in st.session_state.repetidas:
+                st.session_state.repetidas[d] -= 1
+                # Si llegas a 0, eliminamos la entrada del diccionario
+                if st.session_state.repetidas[d] <= 0:
+                    del st.session_state.repetidas[d]
+            # Opcional: Si quieres que también pueda "despegar" del álbum si no hay repes
+            elif d in st.session_state.album:
+                st.session_state.album.remove(d)
 
     guardar_cambios()
     st.balloons()
