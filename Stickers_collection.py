@@ -92,26 +92,24 @@ def procesar_intercambio(recibidas, dadas):
     # 1. Procesar recibidas
     for r in recibidas:
         r = r.strip().upper()
-        if r:
-            # Si ya la tienes en el álbum, va a repetidas
-            if r in st.session_state.album:
-                st.session_state.repetidas[r] = st.session_state.repetidas.get(r, 0) + 1
-            else:
-                # Si no la tienes, se pega en el álbum
-                st.session_state.album.add(r)
+        if not r: continue
 
-    # 2. Procesar dadas (lo que entregas sale de tus repetidas)
+        if r in st.session_state.album:
+            st.session_state.repetidas[r] = st.session_state.repetidas.get(r, 0) + 1
+        else:
+            st.session_state.album.add(r)
+
+    # 2. Procesar dadas
     for d in dadas:
         d = d.strip().upper()
-        if d:
-            if d in st.session_state.repetidas:
-                st.session_state.repetidas[d] -= 1
-                # Si llegas a 0, eliminamos la entrada del diccionario
-                if st.session_state.repetidas[d] <= 0:
-                    del st.session_state.repetidas[d]
-            # Opcional: Si quieres que también pueda "despegar" del álbum si no hay repes
-            elif d in st.session_state.album:
-                st.session_state.album.remove(d)
+        if not d: continue
+
+        if d in st.session_state.repetidas:
+            st.session_state.repetidas[d] -= 1
+            if st.session_state.repetidas[d] <= 0:
+                del st.session_state.repetidas[d]
+        elif d in st.session_state.album:
+            st.session_state.album.remove(d)
 
     guardar_cambios()
     st.balloons()
@@ -129,19 +127,25 @@ with tabs[0]:
 
     with col1:
         st.subheader("📥 Recibo")
-        r1 = st.text_input("Cromo 1", key="r1")
-        r2 = st.text_input("Cromo 2", key="r2")
-        r3 = st.text_input("Cromo 3", key="r3")
+        txt_recibidas = st.text_area("IDs recibidos (separados por coma o espacio)",
+                                     placeholder="CZE 1, MEX 4, USA 18", key="txt_r")
 
     with col2:
         st.subheader("📤 Doy")
-        d1 = st.text_input("Cromo 1", key="d1")
-        d2 = st.text_input("Cromo 2", key="d2")
-        d3 = st.text_input("Cromo 3", key="d3")
+        txt_dadas = st.text_area("IDs entregados (separados por coma o espacio)",
+                                 placeholder="BRA 2, ARG 10", key="txt_d")
 
     if st.button("🤝 CONFIRMAR TRATO", use_container_width=True):
-        procesar_intercambio([r1, r2, r3], [d1, d2, d3])
-        st.success("¡Trato sincronizado con GitHub!")
+        # Convertimos el texto en listas limpias
+        # Reemplazamos comas por espacios y luego dividimos por espacios
+        lista_r = txt_recibidas.replace(',', ' ').split()
+        lista_d = txt_dadas.replace(',', ' ').split()
+
+        if lista_r or lista_d:
+            procesar_intercambio(lista_r, lista_d)
+            st.success(f"✅ ¡Trato sincronizado! Procesados {len(lista_r)} recibidos y {len(lista_d)} entregados.")
+        else:
+            st.warning("⚠️ No ingresaste ningún ID.")
 
 # TAB 2: MI ÁLBUM
 with tabs[1]:
