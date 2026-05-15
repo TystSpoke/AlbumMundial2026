@@ -136,14 +136,15 @@ with tabs[0]:
                                  placeholder="BRA 2, ARG 10", key="txt_d")
 
     if st.button("🤝 CONFIRMAR TRATO", use_container_width=True):
-        # Convertimos el texto en listas limpias
-        # Reemplazamos comas por espacios y luego dividimos por espacios
-        lista_r = txt_recibidas.replace(',', ' ').split()
-        lista_d = txt_dadas.replace(',', ' ').split()
+        # 1. Separamos ÚNICAMENTE por comas
+        # 2. .strip() elimina espacios sobrantes al inicio/final de cada cromo
+        lista_r = [cromo.strip() for cromo in txt_recibidas.split(',') if cromo.strip()]
+        lista_d = [cromo.strip() for cromo in txt_dadas.split(',') if cromo.strip()]
 
         if lista_r or lista_d:
             procesar_intercambio(lista_r, lista_d)
             st.success(f"✅ ¡Trato sincronizado! Procesados {len(lista_r)} recibidos y {len(lista_d)} entregados.")
+            st.rerun()  # Refrescamos para ver los cambios
         else:
             st.warning("⚠️ No ingresaste ningún ID.")
 
@@ -168,7 +169,7 @@ with tabs[2]:
     st.header("♻️ Mis Repetidas")
 
     with st.expander("➕ Añadir manual"):
-        new_rep = st.text_input("Número (Ej: MEX 5):").upper()
+        new_rep = st.text_input("Número (Ej: MEX 5):").upper().strip()  # <--- Agregar .strip()
         if st.button("Guardar Repetida"):
             if new_rep:
                 st.session_state.repetidas[new_rep] = st.session_state.repetidas.get(new_rep, 0) + 1
