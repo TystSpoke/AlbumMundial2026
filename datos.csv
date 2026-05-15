@@ -2,8 +2,8 @@ ID,Tipo,Cantidad
 KSA 12,Colección,1
 MAR 10,Colección,1
 URU 7,Colección,1
-JOR 13,Colección,1
 PAR 19,Colección,1
+JOR 13,Colección,1
 NZL 13,Colección,1
 IRQ 12,Colección,1
 NOR 6,Colección,1
@@ -54,8 +54,8 @@ RSA 7,Colección,1
 JPN 13,Colección,1
 SCO 4,Colección,1
 PAR 9,Colección,1
-COD 12,Colección,1
 UZB 11,Colección,1
+COD 12,Colección,1
 FRA 12,Colección,1
 AUS 4,Colección,1
 MEX 8,Colección,1
@@ -111,6 +111,7 @@ ESP 20,Colección,1
 IRQ 9,Colección,1
 PAR 16,Colección,1
 CZE 6,Colección,1
+FWC 1,Colección,1
 HAI 16,Colección,1
 EGY 3,Colección,1
 AUT 7,Colección,1
