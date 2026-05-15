@@ -3,6 +3,13 @@ import pandas as pd
 from github import Github
 import io
 
+ABREVIATURAS = [
+    "FWC", "MEX", "RSA", "KOR", "CZE", "CAN", "BIH", "QAT", "SUI", "BRA",
+    "MAR", "HAI", "SCO", "USA", "PAR", "AUS", "TUR", "GER", "CUW", "CIV",
+    "ECU", "NED", "JPN", "SWE", "TUN", "BEL", "EGY", "IRN", "NZL", "ESP",
+    "CPV", "KSS", "URU", "FRA", "SEN", "IRQ", "NOR", "ARG", "ALG", "AUT",
+    "JOR", "POR", "COD", "USB", "COL", "ENG", "CRO", "GHA", "PAN"
+]
 # 1. Configuración de la página
 st.set_page_config(page_title="Álbum 2026 Pro", layout="centered")
 
@@ -118,8 +125,8 @@ def procesar_intercambio(recibidas, dadas):
 # --- INTERFAZ DE USUARIO ---
 st.title("⚽ Collector Pro 2026")
 
-tabs = st.tabs(["🤝 Intercambio", "📔 Mi Álbum", "♻️ Repetidas"])
-
+# --- 2. ACTUALIZACIÓN DE TABS ---
+tabs = st.tabs(["🤝 Intercambio", "⚡ Carga Rápida", "📔 Mi Álbum", "♻️ Repetidas"])
 # TAB 1: MODO INTERCAMBIO
 with tabs[0]:
     st.header("¡Nuevo Trato!")
@@ -147,9 +154,42 @@ with tabs[0]:
             st.rerun()  # Refrescamos para ver los cambios
         else:
             st.warning("⚠️ No ingresaste ningún ID.")
-
-# TAB 2: MI ÁLBUM
 with tabs[1]:
+    st.header("⚡ Modo Carga Masiva")
+    st.info("Toca un número para agregarlo. ✅ = Ya lo tienes, se sumará a Repetidas.")
+
+    # Menú desplegable para elegir país (Pestañas internas)
+    pais_sel = st.selectbox("Selecciona el País o Sección", ABREVIATURAS)
+
+    # Creamos una cuadrícula de 4 columnas para que los botones sean grandes en el celular
+    cols = st.columns(4)
+
+    for i in range(1, 21):
+        id_cromo = f"{pais_sel} {i}"
+
+        # Personalizar el texto del botón si ya existe en el álbum
+        esta_en_album = id_cromo in st.session_state.album
+        cant_repes = st.session_state.repetidas.get(id_cromo, 0)
+
+        label = f"✅ {id_cromo}" if esta_en_album else id_cromo
+        if cant_repes > 0:
+            label += f" (+{cant_repes})"
+
+        # Repartir los 20 botones en las columnas
+        with cols[(i - 1) % 4]:
+            if st.button(label, key=f"btn_{id_cromo}", use_container_width=True):
+                # Lógica de inserción
+                if id_cromo in st.session_state.album:
+                    st.session_state.repetidas[id_cromo] = st.session_state.repetidas.get(id_cromo, 0) + 1
+                else:
+                    st.session_state.album.add(id_cromo)
+
+                # Guardado automático y aviso rápido
+                guardar_cambios()
+                st.toast(f"Registrado: {id_cromo}")
+                st.rerun()
+# TAB 2: MI ÁLBUM
+with tabs[2]:
     st.header("📔 Mi Progreso")
     busqueda = st.text_input("🔍 Buscar número:").upper()
     if busqueda:
@@ -165,7 +205,7 @@ with tabs[1]:
         st.write(sorted(list(st.session_state.album)))
 
 # TAB 3: REPETIDAS
-with tabs[2]:
+with tabs[3]:
     st.header("♻️ Mis Repetidas")
 
     with st.expander("➕ Añadir manual"):
