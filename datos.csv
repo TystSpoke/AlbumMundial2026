@@ -1,4 +1,5 @@
 ID,Tipo,Cantidad
+PAR 9,Colección,1
 FRA 12,Colección,1
 CIV 11,Colección,1
 IRQ 12,Colección,1
@@ -27,7 +28,6 @@ SEN 8,Colección,1
 TUR 8,Colección,1
 CZE 20,Colección,1
 SWE 8,Colección,1
-COD 16,Colección,1
 IRN 4,Colección,1
 CPV 8,Colección,1
 AUS 20,Colección,1
@@ -65,6 +65,6 @@ COD 4,Colección,1
 BEL 15,Colección,1
 BIH 19,Colección,1
 RSA 7,Colección,1
-PAR 9,Colección,1
+COD 16,Colección,1
 COD 12,Colección,1
 CZE 15,Repetida,1
